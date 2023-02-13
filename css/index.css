@@ -27,17 +27,18 @@ html {
     letter-spacing: 0.5px;
     line-height: 30px;
     padding: 0 40px;
-    color: #fff;
+    color: rgb(255, 255, 255);
     border-radius: 4px;
     background: transparent;
     margin-right: 10px;
     border: 2px solid rgb(13, 13, 14);
-    transition: all 1s;
+    transition:  1s;
 }
 .tab.active {
     background: rgb(176, 165, 227);
     border: none;
-    transition: all 1s;
+    transition:  1s;
+    color: rgb(17, 10, 10);
 }
 .tab:last-child {
     margin: none;
@@ -46,8 +47,16 @@ html {
 .active {}
 
 .separator {}
-
-.cart-tab {}
+.cart-tab {
+    display: flex;
+}
+.cart-tab::after {
+    content: attr(data-goods-count);
+    display: flex;
+    margin-left: 10px;
+    align-items:center;
+    justify-content: center;
+}
 
 .product-items {
     display: flex;
