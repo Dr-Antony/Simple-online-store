@@ -1,48 +1,6 @@
-// ===========================КНОПКИ ПЕРЕКЛЮЧЕНИЯ ТОВАРЫ\КОРЗИНА=============================
 
-// ============Это работает при наличии соответствующих дата-ид ===========
-// const goods = document.querySelector('button[data-id="goods"]');
-// const cart = document.querySelector('button[data-id="cart"]');
-
-// function clickHandler(event) {
-//     ==========Первый вариант============
-//     const id = event.target.dataset.id;
-//     if (id === 'goods'){
-//         goods.classList.add('active');
-//         cart.classList.remove('active');
-//     }
-//     else if (id ==='cart') {
-//         cart.classList.add('active');
-//         goods.classList.remove('active');
-//     };
-
-//     ==========Второй вариант==============
-//     goods.classList.toggle('active');
-//     cart.classList.toggle('active');
-// };
-// goods.addEventListener('click', clickHandler);
-// cart.addEventListener('click', clickHandler);
-
-
-// ==================Решение задачи серез цикл======================
-// const tabs = document.querySelectorAll('button[data-id="tab"]')
-
-// for (let i = 0; i < tabs.length; i++) {
-//     const tab = tabs[i];
-//     tab.addEventListener('click', clickHandler);
-// }
-
-// function clickHandler(event) {
-//     for (let i = 0; i < tabs.length; i++) {
-//         const tab = tabs[i];
-//         tab.classList.toggle('active');
-//     }
-// }
-
-
-// =====================Третий вариант=================================//
-
-let activeTabId = 'goods';
+let activeTabId = 'cart';
+const goodsInCart = [];
 const initialTab = getActiveTab();
 initialTab.classList.add('active');
 const tabs = document.querySelectorAll('button.tab');
@@ -73,112 +31,124 @@ function removeActiveTabContent() {
 
 function renderTabContentById(tabId) {
     const tabsContainer = document.querySelector('.tabs');
-    let html = "";
+    let html = null;
     if (tabId === 'goods') {
         html = renderGoods();
     } else {
         html = renderCart();
     };
-    tabsContainer.insertAdjacentHTML('afterend', html);
-};
-function renderGoods() {
-    return `
-    <div class="product-items" data-active-tab-content="true">
-    <div class="product-item">
-        <div class="image">
-            <img src="https://thumb.tildacdn.com/tild3830-6234-4531-b132-326435386466/-/format/webp/product-Bayaband-Fli.jpg" alt="">
-        </div>
-        <div class="product-list">
-            <h3>Crocs Bayaband Flip Navy</h3>
-            <p>10$</p>
-            <button data-add-in-cart="true" class="button">Add to cart</button>
-        </div>
-    </div>
-    <div class="product-item">
-        <div class="image">
-            <img src="https://thumb.tildacdn.com/tild3538-3935-4532-a261-376164633666/-/format/webp/e2bc6a9ec99005306921.jpg" alt="">
-        </div>
-        <div class="product-list">
-            <h3>Crocs Crocband™ Clog Navy</h3>
-            <p>15$</p>
-            <button data-add-in-cart="true" class="button">Add to cart</button>
-        </div>
-    </div>
-    <div class="product-item">
-        <div class="image">
-            <img src="https://thumb.tildacdn.com/tild3039-6131-4462-b866-316362626661/-/format/webp/product-LiteRide-Clo.jpg" alt="">
-        </div>
-        <div class="product-list">
-            <h3>Crocs LiteRide Clog Black</h3>
-            <p>30$</p>
-            <button data-add-in-cart="true" class="button">Add to cart</button>
-        </div>
-    </div>
-</div>
-    `
-};
-function renderCart() {
-    return `
-    <div class="cart-items" data-active-tab-content="true">
-    <div class="cart-item">
-        <div class="cart-item-title">Crocs Bayaband Flip Navy</div>
-        <div class="cart-item-count">3шт.</div>
-        <div class="cart-item-price">30$</div>
-    </div>
-    <div class="cart-item">
-        <div class="cart-item-title">Crocs Crocband™ Clog Navy</div>
-        <div class="cart-item-count">1штю</div>
-        <div class="cart-item-price">15$</div>
-    </div>
-    <div class="cart-item">
-        <div class="cart-item-title">Crocs LiteRide Clog Black</div>
-        <div class="cart-item-count">6шт.</div>
-        <div class="cart-item-price">180$</div>
-    </div>
-</div>
-    `;
-};
-
-//--------------------------//
-const goodsInCart = [];
-const addInCartButtons = document.querySelectorAll('button[data-add-in-cart="true"]');
-const tabWithCounter = document.querySelector('button[data-goods-count="0"]');
-
-for (let i = 0; i < addInCartButtons.length; i++) {
-    const button = addInCartButtons[i];
-
-    button.addEventListener('click', addInCartHandler);
-}
-
-function addInCartHandler() {
-    // goodsInCart[goodsInCart.length]= 'g'; Интересный вариант, но костыльный.
-    const product = createProduct();
-    goodsInCart.push(product);
-    tabWithCounter.dataset.goodsCount = goodsInCart.length;
-};
-
-
-
-function createProduct() {
-    return {
-        name: 'crocs',
-        price: 10,
+    if (html !== null) {
+        tabsContainer.after(html);
     }
 };
+function renderGoods() {
+    const div = document.createElement('div');
+    div.dataset.activeTabContent = 'true';
+    div.className = 'product-items';
 
+
+    for (let i = 0; i < GOODS.length; i++) {
+        const product = createProduct(GOODS[i]);
+        const price = product.price === null
+            ? '<p>Товар закончился</p>'
+            : `<p class = "price">${product.price}</p>`;
+
+        const productBlock = document.createElement('div');
+        productBlock.className = 'product-item';
+
+        productBlock.innerHTML = `
+    <div class="image">
+    <img src="${product.imgSrc}" alt="">
+    </div>
+    <div class="product-list">
+    <h3>${product.name}</h3>
+    <p>${product.price}</p>
+    </div>
+    `;
+        if (product.price !== null) {
+            const clickHander = addInCartHandler(product);
+            const button = document.createElement('button')
+            button.className = 'button';
+            button.textContent = 'Add to cart';
+            button.addEventListener('click', clickHander);
+            productBlock.querySelector('.product-list').append(button);
+        }
+        div.append(productBlock)
+    }
+    return div;
+};
+
+const tabWithCounter = document.querySelector('button[data-goods-count="0"]');
+
+
+function addInCartHandler(product) {
+    return () => {
+        let hasProduct = false;
+        let index = null;
+        let count = 1;
+        for(let i = 0; i < goodsInCart.length; i++) {
+            const productInCart = goodsInCart[i];
+            if (product.id === productInCart.id) {
+                hasProduct = true;
+                index = i;
+                count = productInCart.count;
+            }
+        }
+        if(hasProduct) {
+            goodsInCart[index].count= count + 1;
+        }
+        else {
+            const productWithCount = product ;
+            productWithCount.count = count;
+            goodsInCart.push(productWithCount);
+        };
+        console.log(goodsInCart)
+        tabWithCounter.dataset.goodsCount = goodsInCart.length;
+    };
+};
+function createProduct(product) {
+    return {
+        id: product.id,
+        name: product.name ? product.name : 'name unknown',
+        price: product.price ? product.price : 'price unknown',
+        imgSrc: product.imgSrc ? product.imgSrc : 'https://media.istockphoto.com/id/1322277517/photo/wild-grass-in-the-mountains-at-sunset.jpg?s=612x612&w=0&k=20&c=6mItwwFFGqKNKEAzv0mv6TaxhLN3zSE43bWmFN--J5w=',
+    }
+};
 function addClickListeners(elements, callBack) {
     for (let i = 0; i < elements.length; i++) {
         const element = elements[i];
         element.addEventListener('click', callBack);
     }
 }
-
-
 addClickListeners(tabs, clickHandler);
- addClickListeners(addInCartButtons, addInCartHandler);
 
+function renderCart() {
+    const container = document.createElement('div');
+    container.dataset.activeTabContent = 'true';
+    container.className = 'cart-items';
 
-
+    for (let i = 0; i < goodsInCart.lengt; i++) {
+        const product = goodsInCart[i];
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.innerHTML = `
+        <div class="cart-item-title">${product.name}</div>
+        <div class="cart-item-count">${product.count}</div>
+        <div class="cart-item-price">${product.price}</div>
+        `;
+        const button = document.createElement('button');
+        button.className = 'cart-item-delete';
+        button.textContent = 'x';
+    cartItem.append(button)
+    container.append(cartItem);
+    }
+    return container;
+};
+const button = document.querySelectorAll('button.button')
+for (let i = 0; i < button.length; i++) {
+    const button = button[i];
+    button.addEventListener('click', addInCartHandler);
+}
 
 
 
